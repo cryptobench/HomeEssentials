@@ -3,8 +3,6 @@ name: Build and Release
 on:
   push:
     branches: [ master, main ]
-    tags:
-      - 'v*'
   pull_request:
     branches: [ master, main ]
   workflow_dispatch:
@@ -16,8 +14,6 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
-      with:
-        lfs: true
 
     - name: Set up Java 25
       uses: actions/setup-java@v4
@@ -38,7 +34,7 @@ jobs:
   release:
     needs: build
     runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
+    if: github.event_name == 'push' && (github.ref == 'refs/heads/master' || github.ref == 'refs/heads/main')
     permissions:
       contents: write
 
@@ -49,22 +45,35 @@ jobs:
         name: HomeEssentials
         path: ./dist
 
-    - name: Get version from tag
-      id: version
-      run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+    - name: Get short SHA
+      id: sha
+      run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_OUTPUT
+
+    - name: Get current date
+      id: date
+      run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
     - name: Rename JAR
-      run: mv dist/HomeEssentials-*.jar dist/HomeEssentials-${{ steps.version.outputs.VERSION }}.jar
+      run: mv dist/HomeEssentials-*.jar dist/HomeEssentials.jar
+
+    - name: Delete existing latest release
+      run: gh release delete latest --yes || true
+      env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
-        name: HomeEssentials v${{ steps.version.outputs.VERSION }}
+        tag_name: latest
+        name: Latest Build (${{ steps.date.outputs.DATE }})
         body: |
-          ## HomeEssentials v${{ steps.version.outputs.VERSION }}
+          ## HomeEssentials - Latest Build
+
+          **Commit:** ${{ github.sha }}
+          **Date:** ${{ steps.date.outputs.DATE }}
 
           ### Installation
-          1. Download `HomeEssentials-${{ steps.version.outputs.VERSION }}.jar`
+          1. Download `HomeEssentials.jar`
           2. Place in your Hytale server's `mods/` folder
           3. Restart the server
 
@@ -76,4 +85,6 @@ jobs:
 
           ### Commands
           `/sethome [name]` `/home [name]` `/homes` `/delhome <name>` `/homehelp`
-        files: dist/HomeEssentials-${{ steps.version.outputs.VERSION }}.jar
+        files: dist/HomeEssentials.jar
+        prerelease: false
+        make_latest: true
