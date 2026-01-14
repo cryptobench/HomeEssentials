@@ -1,4 +1,4 @@
-package com.homeessentials.data;
+package com.easyhome.data;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;

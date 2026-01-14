@@ -4,13 +4,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.homeessentials</groupId>
-    <artifactId>HomeEssentials</artifactId>
+    <groupId>com.easyhome</groupId>
+    <artifactId>EasyHome</artifactId>
     <version>1.0.0</version>
     <packaging>jar</packaging>
 
-    <name>HomeEssentials</name>
-    <description>User-friendly home management plugin for Hytale</description>
+    <name>EasyHome</name>
+    <description>Let players save locations and teleport back instantly</description>
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
@@ -72,7 +72,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.homeessentials.HomeEssentials</mainClass>
+                            <mainClass>com.easyhome.EasyHome</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

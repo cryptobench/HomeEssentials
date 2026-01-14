@@ -1,6 +1,6 @@
-package com.homeessentials.commands;
+package com.easyhome.commands;
 
-import com.homeessentials.HomeEssentials;
+import com.easyhome.EasyHome;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.Message;
@@ -24,7 +24,7 @@ public class HomeHelpCommand extends AbstractPlayerCommand {
     private static final Color GREEN = new Color(85, 255, 85);
     private static final Color AQUA = new Color(85, 255, 255);
 
-    public HomeHelpCommand(HomeEssentials plugin) {
+    public HomeHelpCommand(EasyHome plugin) {
         super("homehelp", "Show help for home commands");
     }
 
@@ -36,7 +36,7 @@ public class HomeHelpCommand extends AbstractPlayerCommand {
                           @Nonnull World world) {
 
         send(playerData, "");
-        send(playerData, "---------- HomeEssentials ----------", GOLD);
+        send(playerData, "---------- EasyHome ----------", GOLD);
         send(playerData, "");
 
         // Commands

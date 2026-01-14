@@ -1,9 +1,9 @@
-package com.homeessentials.commands;
+package com.easyhome.commands;
 
-import com.homeessentials.HomeEssentials;
-import com.homeessentials.data.Home;
-import com.homeessentials.data.PlayerHomes;
-import com.homeessentials.util.Messages;
+import com.easyhome.EasyHome;
+import com.easyhome.data.Home;
+import com.easyhome.data.PlayerHomes;
+import com.easyhome.util.Messages;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
@@ -21,9 +21,9 @@ import java.util.Collection;
  */
 public class HomesCommand extends AbstractPlayerCommand {
 
-    private final HomeEssentials plugin;
+    private final EasyHome plugin;
 
-    public HomesCommand(HomeEssentials plugin) {
+    public HomesCommand(EasyHome plugin) {
         super("homes", "List all your saved homes");
         this.plugin = plugin;
 

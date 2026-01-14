@@ -1,4 +1,4 @@
-package com.homeessentials.data;
+package com.easyhome.data;
 
 import java.util.Collection;
 import java.util.HashMap;

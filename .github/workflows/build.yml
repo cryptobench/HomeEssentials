@@ -28,8 +28,8 @@ jobs:
     - name: Upload artifact
       uses: actions/upload-artifact@v4
       with:
-        name: HomeEssentials
-        path: target/HomeEssentials-*.jar
+        name: EasyHome
+        path: target/EasyHome-*.jar
 
   release:
     needs: build
@@ -42,7 +42,7 @@ jobs:
     - name: Download artifact
       uses: actions/download-artifact@v4
       with:
-        name: HomeEssentials
+        name: EasyHome
         path: ./dist
 
     - name: Get short SHA
@@ -53,38 +53,57 @@ jobs:
       id: date
       run: echo "DATE=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
 
-    - name: Rename JAR
-      run: mv dist/HomeEssentials-*.jar dist/HomeEssentials.jar
+    - name: Set version
+      id: version
+      run: echo "VERSION=v1.0.${{ github.run_number }}" >> $GITHUB_OUTPUT
 
-    - name: Delete existing latest release
-      run: gh release delete latest --yes || true
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Rename JAR
+      run: mv dist/EasyHome-*.jar dist/EasyHome-${{ steps.version.outputs.VERSION }}.jar
 
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: latest
-        name: Latest Build (${{ steps.date.outputs.DATE }})
+        tag_name: ${{ steps.version.outputs.VERSION }}
+        name: EasyHome ${{ steps.version.outputs.VERSION }}
         body: |
-          ## HomeEssentials - Latest Build
+          ## EasyHome ${{ steps.version.outputs.VERSION }}
 
-          **Commit:** ${{ github.sha }}
+          **Commit:** `${{ steps.sha.outputs.SHORT_SHA }}`
           **Date:** ${{ steps.date.outputs.DATE }}
 
           ### Installation
-          1. Download `HomeEssentials.jar`
+          1. Download `EasyHome-${{ steps.version.outputs.VERSION }}.jar`
           2. Place in your Hytale server's `mods/` folder
           3. Restart the server
 
-          ### Setup
-          ```
-          perm group add default homes.use
-          perm group add default homes.limit.1
-          ```
+          ### Features
+          - Multiple named homes (base, mine, farm, etc.)
+          - Configurable home limits
+          - Configurable teleport delay
+          - Permission-based limits for different groups
 
           ### Commands
-          `/sethome [name]` `/home [name]` `/homes` `/delhome <name>` `/homehelp`
-        files: dist/HomeEssentials.jar
+          | Command | Description |
+          |---------|-------------|
+          | `/sethome [name]` | Save current location |
+          | `/home [name]` | Teleport to a home |
+          | `/homes` | List all your homes |
+          | `/delhome <name>` | Delete a home |
+
+          ### Admin Commands
+          | Command | Description |
+          |---------|-------------|
+          | `/easyhome admin config` | Show settings |
+          | `/easyhome admin set default 3` | Everyone gets 3 homes |
+          | `/easyhome admin set max 25` | Max homes allowed |
+          | `/easyhome admin set warmup 0` | Instant teleport |
+
+          ### Quick Setup
+          ```
+          perm group add Adventure homes.use
+          perm group add admin homes.admin
+          /easyhome admin set default 3
+          ```
+        files: dist/EasyHome-${{ steps.version.outputs.VERSION }}.jar
         prerelease: false
         make_latest: true

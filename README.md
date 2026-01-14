@@ -1,117 +1,172 @@
-# HomeEssentials
+# EasyHome
 
-A user-friendly home management plugin for Hytale servers. Allows players to save, teleport to, and manage multiple named home locations.
+Let players save locations and teleport back instantly! Perfect for survival servers.
+
+## Quick Start
+
+1. **Install**: Download the [latest release](../../releases/latest) and drop the JAR into your server's `mods/` folder
+2. **Restart** your server
+3. **Set a home**: Stand where you want and type `/sethome`
+4. **Teleport back**: Type `/home` from anywhere!
+
+That's it! Players can now save and teleport to their favorite spots.
+
+---
 
 ## Features
 
-- **Multiple named homes** - Save locations with custom names
-- **Permission-based limits** - Configure how many homes each player/group can have
-- **Teleport warmup** - 3-second warmup that cancels if player moves
-- **Clean colored messages** - Easy to read feedback
-- **Simple commands** - Intuitive command syntax
+- **Multiple Homes** - Save spots like "base", "mine", "farm" and teleport between them
+- **Easy Limits** - Choose how many homes players can have
+- **Teleport Delay** - Optional countdown before teleporting (stops combat logging)
+- **Simple Setup** - Configure everything in-game, no files to edit
 
-## Commands
+---
 
-| Command | Description |
-|---------|-------------|
-| `/sethome` | Save current location as 'home' |
-| `/sethome <name>` | Save current location with custom name |
-| `/home` | Teleport to 'home' |
-| `/home <name>` | Teleport to named home |
-| `/homes` | List all your saved homes |
-| `/delhome <name>` | Delete a saved home |
-| `/homehelp` | Show help and setup guide |
+## Player Commands
 
-## Permissions
+| Command | What it does |
+|---------|--------------|
+| `/sethome` | Save where you're standing as "home" |
+| `/sethome base` | Save where you're standing as "base" |
+| `/home` | Teleport to "home" |
+| `/home base` | Teleport to "base" |
+| `/homes` | See all your saved homes |
+| `/delhome base` | Delete "base" |
+| `/homehelp` | Show help |
 
-| Permission | Description |
-|------------|-------------|
-| `homes.use` | Basic access to home commands |
-| `homes.limit.1` | Allow 1 home (default if no limit set) |
-| `homes.limit.3` | Allow 3 homes |
-| `homes.limit.5` | Allow 5 homes |
-| `homes.limit.unlimited` | Unlimited homes |
-| `homes.bypass.warmup` | Skip the 3-second teleport delay |
+---
 
-## Installation
+## Server Owner Setup
 
-1. Build the plugin:
-   ```bash
-   mvn clean package
-   ```
+### Step 1: Let players use homes
 
-2. Copy `target/HomeEssentials-1.0.0.jar` to your server's `mods/` folder
-
-3. Start/restart the server
-
-## Quick Setup
-
-Run these commands in the server console to set up basic permissions:
-
+Run this in your console:
 ```
-perm group add default homes.use
-perm group add default homes.limit.1
+perm group add Adventure homes.use
 ```
 
-For VIP players with more homes:
+Done! Players can now use `/sethome` and `/home`.
+
+### Step 2: Choose how many homes players get
+
+**Want everyone to have 3 homes?**
 ```
+/easyhome admin set default 3
+```
+
+**Want to turn off the teleport delay?**
+```
+/easyhome admin set warmup 0
+```
+
+**Want instant teleport for admins only?**
+```
+perm group add admin homes.bypass.warmup
+```
+
+---
+
+## Admin Commands
+
+### See your current settings
+```
+/easyhome admin config
+```
+
+### Change how many homes everyone gets
+```
+/easyhome admin set default 5
+```
+
+### Change the maximum homes allowed
+```
+/easyhome admin set max 25
+```
+
+### Change the teleport delay
+```
+/easyhome admin set warmup 5
+```
+Set to `0` for instant teleport.
+
+### Turn permission-based limits on/off
+```
+/easyhome admin set permissions off
+```
+When OFF: Everyone gets the same number of homes.
+
+When ON: You can give different groups different limits using permissions.
+
+---
+
+## Giving Different Groups Different Limits
+
+Want VIPs to have more homes than regular players? Here's how:
+
+**First, turn on permission mode:**
+```
+/easyhome admin set permissions on
+```
+
+**Then set up your groups:**
+```
+perm group add Adventure homes.use
+perm group add Adventure homes.limit.1
+
 perm group add vip homes.use
-perm group add vip homes.limit.3
-```
+perm group add vip homes.limit.5
 
-For admins with unlimited homes:
-```
 perm group add admin homes.use
 perm group add admin homes.limit.unlimited
+perm group add admin homes.admin
 ```
 
-## Usage Examples
+Now regular players get 1 home, VIPs get 5, and admins get unlimited!
 
-**Save your first home:**
-```
-/sethome
-```
+---
 
-**Save a home called "base":**
-```
-/sethome base
-```
+## All Permissions
 
-**Teleport home:**
-```
-/home
-```
+| Permission | What it does |
+|------------|--------------|
+| `homes.use` | Can use home commands |
+| `homes.admin` | Can use `/easyhome admin` |
+| `homes.limit.1` | Can have 1 home |
+| `homes.limit.3` | Can have 3 homes |
+| `homes.limit.5` | Can have 5 homes |
+| `homes.limit.10` | Can have 10 homes |
+| `homes.limit.25` | Can have 25 homes |
+| `homes.limit.50` | Can have 50 homes |
+| `homes.limit.unlimited` | Can have max homes |
+| `homes.bypass.warmup` | Teleports instantly (no delay) |
 
-**Teleport to "base":**
-```
-/home base
-```
+---
 
-**See all your homes:**
-```
-/homes
-```
+## Common Questions
 
-**Delete a home:**
+### "How do I give everyone 3 homes without messing with permissions?"
 ```
-/delhome base
+/easyhome admin set default 3
+/easyhome admin set permissions off
 ```
 
-## Data Storage
-
-Player homes are stored as JSON files in `mods/Community_HomeEssentials/homes/`:
+### "Players say teleporting takes too long"
 ```
-homes/
-  ├── <player-uuid-1>.json
-  ├── <player-uuid-2>.json
-  └── ...
+/easyhome admin set warmup 0
 ```
 
-## Requirements
+### "A player says they can't set more homes"
+Either increase the default limit:
+```
+/easyhome admin set default 5
+```
+Or give them a higher permission:
+```
+perm user add PlayerName homes.limit.10
+```
 
-- Hytale Server
-- Java 25
+---
 
 ## License
 
-MIT License - Feel free to modify and distribute.
+MIT - Use it however you like!

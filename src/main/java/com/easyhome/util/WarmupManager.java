@@ -1,6 +1,6 @@
-package com.homeessentials.util;
+package com.easyhome.util;
 
-import com.homeessentials.data.Home;
+import com.easyhome.data.Home;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.vector.Vector3d;
@@ -23,9 +23,6 @@ import java.util.concurrent.TimeUnit;
  * Manages teleport warmups with movement cancellation.
  */
 public class WarmupManager {
-    private static final int WARMUP_SECONDS = 3;
-    private static final double MOVEMENT_THRESHOLD = 0.5;
-
     private final ScheduledExecutorService scheduler;
     private final Map<UUID, WarmupData> activeWarmups;
 
@@ -34,18 +31,28 @@ public class WarmupManager {
         this.activeWarmups = new ConcurrentHashMap<>();
     }
 
+    /**
+     * Start a warmup for teleportation.
+     *
+     * @param warmupSeconds    How long to wait before teleporting (0 = instant)
+     * @param movementThreshold How far player can move before cancel (in blocks)
+     * @param bypassWarmup     If true, teleport instantly regardless of warmupSeconds
+     */
     public void startWarmup(PlayerRef playerData,
                            Ref<EntityStore> playerRef,
                            Store<EntityStore> store,
                            World currentWorld,
                            Home home,
+                           int warmupSeconds,
+                           double movementThreshold,
                            boolean bypassWarmup) {
         UUID playerId = playerData.getUuid();
 
         // Cancel any existing warmup
         cancelWarmup(playerId);
 
-        if (bypassWarmup) {
+        // Instant teleport if bypassing or warmup is 0
+        if (bypassWarmup || warmupSeconds <= 0) {
             executeTeleport(playerData, playerRef, store, currentWorld, home);
             return;
         }
@@ -55,11 +62,11 @@ public class WarmupManager {
         Vector3d startPos = transform.getPosition();
 
         // Send warmup message
-        playerData.sendMessage(Messages.warmupStarted(home.getName(), WARMUP_SECONDS));
+        playerData.sendMessage(Messages.warmupStarted(home.getName(), warmupSeconds));
 
         // Create warmup data
         WarmupData data = new WarmupData(playerData, playerRef, store, currentWorld, home,
-                startPos.getX(), startPos.getY(), startPos.getZ());
+                startPos.getX(), startPos.getY(), startPos.getZ(), movementThreshold);
 
         // Schedule position checks every 500ms
         ScheduledFuture<?> checkFuture = scheduler.scheduleAtFixedRate(() -> {
@@ -69,7 +76,7 @@ public class WarmupManager {
         // Schedule teleport after warmup
         ScheduledFuture<?> teleportFuture = scheduler.schedule(() -> {
             doTeleport(playerId);
-        }, WARMUP_SECONDS, TimeUnit.SECONDS);
+        }, warmupSeconds, TimeUnit.SECONDS);
 
         data.checkFuture = checkFuture;
         data.teleportFuture = teleportFuture;
@@ -96,7 +103,7 @@ public class WarmupManager {
                     double dz = currentPos.getZ() - data.startZ;
                     double distance = Math.sqrt(dx * dx + dy * dy + dz * dz);
 
-                    if (distance > MOVEMENT_THRESHOLD) {
+                    if (distance > data.movementThreshold) {
                         data.playerData.sendMessage(Messages.teleportCancelled());
                         cancelWarmup(playerId);
                     }
@@ -180,11 +187,13 @@ public class WarmupManager {
         final World currentWorld;
         final Home home;
         final double startX, startY, startZ;
+        final double movementThreshold;
         ScheduledFuture<?> checkFuture;
         ScheduledFuture<?> teleportFuture;
 
         WarmupData(PlayerRef playerData, Ref<EntityStore> playerRef, Store<EntityStore> store,
-                  World currentWorld, Home home, double startX, double startY, double startZ) {
+                  World currentWorld, Home home, double startX, double startY, double startZ,
+                  double movementThreshold) {
             this.playerData = playerData;
             this.playerRef = playerRef;
             this.store = store;
@@ -193,6 +202,7 @@ public class WarmupManager {
             this.startX = startX;
             this.startY = startY;
             this.startZ = startZ;
+            this.movementThreshold = movementThreshold;
         }
     }
 }

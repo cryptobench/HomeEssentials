@@ -1,4 +1,4 @@
-package com.homeessentials.data;
+package com.easyhome.data;
 
 /**
  * Represents a saved home location.

@@ -1,15 +1,15 @@
-package com.homeessentials.commands;
+package com.easyhome.commands;
 
-import com.homeessentials.HomeEssentials;
-import com.homeessentials.data.Home;
-import com.homeessentials.data.PlayerHomes;
-import com.homeessentials.util.Messages;
+import com.easyhome.EasyHome;
+import com.easyhome.config.HomeConfig;
+import com.easyhome.data.Home;
+import com.easyhome.data.PlayerHomes;
+import com.easyhome.util.Messages;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
-import com.hypixel.hytale.server.core.command.system.arguments.system.OptionalArg;
-import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
+import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.universe.PlayerRef;
 import com.hypixel.hytale.server.core.universe.world.World;
 import com.hypixel.hytale.server.core.universe.world.storage.EntityStore;
@@ -22,15 +22,24 @@ import javax.annotation.Nonnull;
 public class HomeCommand extends AbstractPlayerCommand {
     private static final String DEFAULT_HOME_NAME = "home";
 
-    private final HomeEssentials plugin;
-    private final OptionalArg<String> nameArg;
+    private final EasyHome plugin;
 
-    public HomeCommand(HomeEssentials plugin) {
+    public HomeCommand(EasyHome plugin) {
         super("home", "Teleport to one of your saved homes");
         this.plugin = plugin;
+        setAllowsExtraArguments(true);  // Allow positional arguments
+    }
 
-        this.nameArg = withOptionalArg("name", "Name of the home to teleport to (default: home)", ArgTypes.STRING);
-
+    private String parseHomeName(CommandContext ctx) {
+        String input = ctx.getInputString().trim();
+        if (input.isEmpty()) {
+            return null;
+        }
+        String[] args = input.split("\\s+");
+        if (args.length > 1) {
+            return args[1];
+        }
+        return null;
     }
 
     @Override
@@ -40,7 +49,7 @@ public class HomeCommand extends AbstractPlayerCommand {
                           @Nonnull PlayerRef playerData,
                           @Nonnull World world) {
 
-        String homeName = nameArg.get(ctx);
+        String homeName = parseHomeName(ctx);
         if (homeName == null || homeName.isEmpty()) {
             homeName = DEFAULT_HOME_NAME;
         }
@@ -57,7 +66,18 @@ public class HomeCommand extends AbstractPlayerCommand {
             return;
         }
 
-        // Always use warmup - bypass disabled for now
-        plugin.getWarmupManager().startWarmup(playerData, playerRef, store, world, home, false);
+        // Get config values
+        HomeConfig config = plugin.getConfig();
+        int warmupSeconds = config.getWarmupSeconds();
+        double movementThreshold = config.getMovementThreshold();
+
+        // Check for warmup bypass permission
+        Player player = store.getComponent(playerRef, Player.getComponentType());
+        boolean bypassWarmup = player.hasPermission("homes.bypass.warmup");
+
+        plugin.getWarmupManager().startWarmup(
+                playerData, playerRef, store, world, home,
+                warmupSeconds, movementThreshold, bypassWarmup
+        );
     }
 }

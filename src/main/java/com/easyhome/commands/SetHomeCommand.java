@@ -1,16 +1,14 @@
-package com.homeessentials.commands;
+package com.easyhome.commands;
 
-import com.homeessentials.HomeEssentials;
-import com.homeessentials.data.Home;
-import com.homeessentials.data.PlayerHomes;
-import com.homeessentials.util.Messages;
+import com.easyhome.EasyHome;
+import com.easyhome.data.Home;
+import com.easyhome.data.PlayerHomes;
+import com.easyhome.util.Messages;
 import com.hypixel.hytale.component.Ref;
 import com.hypixel.hytale.component.Store;
 import com.hypixel.hytale.math.vector.Vector3d;
 import com.hypixel.hytale.math.vector.Vector3f;
 import com.hypixel.hytale.server.core.command.system.CommandContext;
-import com.hypixel.hytale.server.core.command.system.arguments.system.OptionalArg;
-import com.hypixel.hytale.server.core.command.system.arguments.types.ArgTypes;
 import com.hypixel.hytale.server.core.command.system.basecommands.AbstractPlayerCommand;
 import com.hypixel.hytale.server.core.entity.entities.Player;
 import com.hypixel.hytale.server.core.modules.entity.component.TransformComponent;
@@ -29,15 +27,25 @@ public class SetHomeCommand extends AbstractPlayerCommand {
     private static final Pattern VALID_NAME_PATTERN = Pattern.compile("^[a-zA-Z0-9_]+$");
     private static final int MAX_NAME_LENGTH = 32;
 
-    private final HomeEssentials plugin;
-    private final OptionalArg<String> nameArg;
+    private final EasyHome plugin;
 
-    public SetHomeCommand(HomeEssentials plugin) {
+    public SetHomeCommand(EasyHome plugin) {
         super("sethome", "Save your current location as a home");
         this.plugin = plugin;
+        setAllowsExtraArguments(true);  // Allow positional arguments
+    }
 
-        this.nameArg = withOptionalArg("name", "Name for this home (default: home)", ArgTypes.STRING);
-
+    private String parseHomeName(CommandContext ctx) {
+        String input = ctx.getInputString().trim();
+        if (input.isEmpty()) {
+            return null;
+        }
+        String[] args = input.split("\\s+");
+        // Skip command name, return first argument if present
+        if (args.length > 1) {
+            return args[1];
+        }
+        return null;
     }
 
     @Override
@@ -49,7 +57,7 @@ public class SetHomeCommand extends AbstractPlayerCommand {
 
         Player player = store.getComponent(playerRef, Player.getComponentType());
 
-        String homeName = nameArg.get(ctx);
+        String homeName = parseHomeName(ctx);
         if (homeName == null || homeName.isEmpty()) {
             homeName = DEFAULT_HOME_NAME;
         }

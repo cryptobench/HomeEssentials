@@ -1,6 +1,10 @@
 # Build output
 target/
 
+# Local dependencies (but keep HytaleServer.jar for CI)
+lib/*.jar
+!lib/HytaleServer.jar
+
 # IDE
 .idea/
 *.iml

@@ -1,11 +1,11 @@
-package com.homeessentials.util;
+package com.easyhome.util;
 
 import com.hypixel.hytale.server.core.Message;
 
 import java.awt.Color;
 
 /**
- * Centralized message formatting for HomeEssentials.
+ * Centralized message formatting for EasyHome.
  */
 public class Messages {
     // Colors

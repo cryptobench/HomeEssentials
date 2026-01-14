@@ -1,9 +1,9 @@
 {
-    "Group": "Community",
-    "Name": "HomeEssentials",
+    "Group": "cryptobench",
+    "Name": "EasyHome",
     "Version": "1.0.0",
-    "Main": "com.homeessentials.HomeEssentials",
-    "Description": "User-friendly home management plugin with multiple named homes, permission-based limits, and teleport warmup",
+    "Main": "com.easyhome.EasyHome",
+    "Description": "Let players save locations and teleport back instantly",
     "Authors": [],
     "Website": "",
     "Dependencies": {},
