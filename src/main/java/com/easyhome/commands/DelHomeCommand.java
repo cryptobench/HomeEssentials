@@ -27,6 +27,7 @@ public class DelHomeCommand extends AbstractPlayerCommand {
         super("delhome", "Delete one of your saved homes");
         this.plugin = plugin;
         setAllowsExtraArguments(true);  // Allow positional arguments
+        requirePermission("homes.use");
     }
 
     private String parseHomeName(CommandContext ctx) {

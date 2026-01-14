@@ -26,7 +26,7 @@ public class HomesCommand extends AbstractPlayerCommand {
     public HomesCommand(EasyHome plugin) {
         super("homes", "List all your saved homes");
         this.plugin = plugin;
-
+        requirePermission("homes.use");
     }
 
     @Override

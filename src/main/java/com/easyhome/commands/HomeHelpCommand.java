@@ -68,8 +68,8 @@ public class HomeHelpCommand extends AbstractPlayerCommand {
 
         // Setup
         send(playerData, "SETUP (run in console):", GREEN);
-        send(playerData, "  perm group add default homes.use", GRAY);
-        send(playerData, "  perm group add default homes.limit.1", GRAY);
+        send(playerData, "  perm group add Adventure homes.use", GRAY);
+        send(playerData, "  perm group add Adventure homes.limit.3", GRAY);
         send(playerData, "");
         send(playerData, "------------------------------------", GOLD);
     }

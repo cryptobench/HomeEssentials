@@ -28,6 +28,7 @@ public class HomeCommand extends AbstractPlayerCommand {
         super("home", "Teleport to one of your saved homes");
         this.plugin = plugin;
         setAllowsExtraArguments(true);  // Allow positional arguments
+        requirePermission("homes.use");
     }
 
     private String parseHomeName(CommandContext ctx) {

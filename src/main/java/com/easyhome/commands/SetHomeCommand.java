@@ -33,6 +33,7 @@ public class SetHomeCommand extends AbstractPlayerCommand {
         super("sethome", "Save your current location as a home");
         this.plugin = plugin;
         setAllowsExtraArguments(true);  // Allow positional arguments
+        requirePermission("homes.use");
     }
 
     private String parseHomeName(CommandContext ctx) {
